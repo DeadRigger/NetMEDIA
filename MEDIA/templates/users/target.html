@@ -1,0 +1,72 @@
+<div class="card">
+	<div class="card-header d-flex">
+		<span class="h2 flex-grow-1">Создать задачу</span>
+		<button class="btn btn-light rounded text-lg font-weight-bold" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+				+
+    </button>
+	</div>
+	<div class="collapse" id="collapseExample">
+	  <form method="post">
+			{% csrf_token %}
+			<div class="card-body">
+				<div class="input-group mb-3">
+				  <div class="input-group-prepend">
+				    <span class="input-group-text" id="input-title">Тема</span>
+				  </div>
+				  <input name="title_target" type="text" class="form-control" placeholder="Название задания" aria-describedby="input-title">
+				</div>
+
+				<label for="short-text">Описание</label>
+				<div class="input-group mb-3">
+						<textarea name="short_target" id="short-text" class="form-control"></textarea>
+				</div>
+
+				<label for="price">Цена</label>
+				<div class="input-group mb-3">
+				  <div class="input-group-prepend">
+				    <span class="input-group-text">$</span>
+				  </div>
+				  <input name="price" type="text" id="price" class="form-control" aria-label="Amount (to the nearest dollar)">
+				</div>
+			</div>
+			<div class="card-footer text-right">
+					<input type="submit" class="btn btn-primary" value="Создать">
+			</div>
+		</form>
+	</div>
+</div>
+
+<div class="card">
+	<div class="card-header">
+		<h2>Задачи</h2>
+	</div>
+	<div class="card-body">
+		<div class="card">
+		{% for article in articles %}
+		  <div class="card bg-light mb-3">
+						<div class="row no-gutters">
+								<div class="col-sm-4">
+										<img src="" class="card-img" alt="">
+								</div>
+								<div class="col-sm-8">
+										<div class="card-body">
+												<h5 class="card-title">{{ article.title }}</h5>
+												<p class="card-text">{{ article.legend }}...</p>
+												<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#article{{ article.id }}">
+														Редактировать
+												</button>
+												<p class="card-text"><small class="text-muted">{{ article.time_published }}</small></p>
+												<hr>
+												{% for tag in article.tags.all %}
+												<a href="/articles/?tag={{ tag.name }}" class="badge badge-primary">{{ tag.name }}</a>
+												{% endfor %}
+										</div>
+								</div>
+						</div>
+		  </div>
+		{% empty %}
+			<h2 class="list-group-item">У вас нет ни одной статьи</h2>
+		{% endfor %}
+		</div>
+	</div>
+</div>

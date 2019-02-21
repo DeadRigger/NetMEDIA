@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}{{ user.get_full_name }}{% endblock title %}
+{% block content %}
+<!--Alerts-->
+{% for alert in alerts.user %}
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+  Вы успешно изменили {{ alert }}
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+{% endfor %}
+
+{% if alerts.article.success is not None %}
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+  Вы опубликовали статью {{ alerts.article.success }}
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+{% endif %}
+
+{% if alerts.article.danger is not None %}
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+  {{ alerts.article.danger }}
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+{% endif %}
+
+
+<div class="nav nav-pills my-3" id="pills-tab" role="tablist">
+{% for tab in header.user_tabs %}
+    {% if tab.name == "logout" %}
+    <a class="nav-link" href="{{ tab.href }}">{{ tab.ru }}</a>
+    {% elif tab.name == "comments" %}
+    <a class="nav-link {% if section == tab.name %}active{% endif %}" id="{{ tab.name }}-tab" data-toggle="pill" href="#section-{{ tab.name }}" role="tab" aria-controls="section-{{ tab.name }}" aria-selected="False">
+      {{ tab.ru }}<span class="badge badge-light">9</span>
+    </a>
+    {% else %}
+    <a class="nav-link {% if section == tab.name %}active{% endif %}" id="{{ tab.name }}-tab" data-toggle="pill" href="#section-{{ tab.name }}" role="tab" aria-controls="section-{{ tab.name }}" aria-selected="False">{{ tab.ru }}</a>
+    {% endif %}
+{% endfor %}
+</div>
+<div class="tab-content" id="v-pills-tabContent">
+{% for tab in header.user_tabs %}
+    {% if tab.name != "logout" %}
+    <div class="tab-pane fade {% if section == tab.name %}show active{% endif %}" id="section-{{ tab.name }}" role="tabpanel" aria-labelledby="{{ tab.name }}-tab">
+        {% include tab.html with user=user %}
+    </div>
+    {% endif %}
+{% endfor %}
+</div>
+{% endblock content %}
+
+{% block scripts %}
+<script>
+    $(function () {
+        {% if section is None %}
+        $('#profile-tab').tab('show')
+        {% else %}
+        $('#{{ section }}-tab').tab('show')
+        {% endif %}
+    })
+</script>
+{% endblock scripts %}

@@ -1,0 +1,61 @@
+<div class="card">
+		<div class="card-header">
+				<h2>{{ user.get_full_name }}</h2>
+		</div>
+		<form method="post">
+				{% csrf_token %}
+				<div class="card-body">
+						<div class="input-group mb-3">
+						  <div class="input-group-prepend">
+						    <span class="input-group-text" id="input-login">Логин</span>
+						  </div>
+						  <input name="username" type="text" class="form-control" placeholder="{{ user.username }}" aria-describedby="input-login">
+						</div>
+
+						<div class="input-group mb-3">
+						  <div class="input-group-prepend">
+						    <span class="input-group-text" id="input-email">Эл. Почта</span>
+						  </div>
+						  <input name="email" type="text" class="form-control" placeholder="{{ user.email }}" aria-describedby="input-email">
+						</div>
+
+						<div class="input-group mb-3">
+						  <div class="input-group-prepend">
+						    <span class="input-group-text" id="input-url">Личная ссылка</span>
+						  </div>
+						  <input name="url" type="text" class="form-control" placeholder="https://example.com/profile/{{ user.id }}" aria-describedby="input-url">
+						</div>
+
+						<div class="input-group mb-3">
+						  <div class="input-group-prepend">
+						    <span class="input-group-text" id="input-first-name">Имя</span>
+						  </div>
+						  <input name="firstname" type="text" class="form-control" placeholder="{{ user.first_name }}" aria-describedby="input-first-name">
+						</div>
+
+						<div class="input-group mb-3">
+						  <div class="input-group-prepend">
+						    <span class="input-group-text" id="input-last-name">Фамилия</span>
+						  </div>
+						  <input name="lastname" type="text" class="form-control" placeholder="{{ user.last_name }}" aria-describedby="input-last-name">
+						</div>
+
+						<div class="input-group mb-3">
+						  <div class="input-group-prepend">
+						    <span class="input-group-text" id="input-old-password">Текущий пароль</span>
+						  </div>
+						  <input name="oldpass" type="password" class="form-control" aria-describedby="input-old-password">
+						</div>
+
+						<div class="input-group mb-3">
+						  <div class="input-group-prepend">
+						    <span class="input-group-text" id="input-new-password">Новый пароль</span>
+						  </div>
+						  <input name="newpass" type="password" class="form-control" aria-describedby="input-new-password">
+						</div>
+				</div>
+				<div class="card-footer text-right">
+						<input type="submit" class="btn btn-primary" value="Сохранить изменения">
+				</div>
+		</form>
+</div>
