@@ -2,7 +2,7 @@
 		<div class="card-header">
 				<h2>{{ user.get_full_name }}</h2>
 		</div>
-		<form method="post">
+		<form method="post" action="/profile/?section=profile">
 				{% csrf_token %}
 				<div class="card-body">
 						<div class="input-group mb-3">

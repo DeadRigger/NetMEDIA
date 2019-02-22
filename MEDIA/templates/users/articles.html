@@ -6,7 +6,7 @@
     </button>
 	</div>
 	<div class="collapse" id="collapseExample">
-	  <form method="post">
+	  <form method="post" action="/profile/?section=articles">
 			{% csrf_token %}
 			<div class="card-body">
 				<div class="input-group mb-3">
@@ -34,7 +34,7 @@
 				</div>
 			</div>
 			<div class="card-footer text-right">
-					<input type="submit" class="btn btn-primary" value="Опубликовать">
+					<input name="form_add" type="submit" class="btn btn-primary" value="Опубликовать">
 			</div>
 		</form>
 	</div>
@@ -45,32 +45,78 @@
 		<h2>Cтатьи</h2>
 	</div>
 	<div class="card-body">
-		<div class="card">
 		{% for article in articles %}
 		  <div class="card bg-light mb-3">
-						<div class="row no-gutters">
-								<div class="col-sm-4">
-										<img src="" class="card-img" alt="">
-								</div>
-								<div class="col-sm-8">
-										<div class="card-body">
-												<h5 class="card-title">{{ article.title }}</h5>
-												<p class="card-text">{{ article.legend }}...</p>
-												<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#article{{ article.id }}">
-														Редактировать
-												</button>
-												<p class="card-text"><small class="text-muted">{{ article.time_published }}</small></p>
-												<hr>
-												{% for tag in article.tags.all %}
-												<a href="/articles/?tag={{ tag.name }}" class="badge badge-primary">{{ tag.name }}</a>
-												{% endfor %}
-										</div>
+				<div class="row no-gutters">
+						<div class="col-sm-4">
+								<img src="" class="card-img" alt="">
+						</div>
+						<div class="col-sm-8">
+								<div class="card-body">
+										<h5 class="card-title">{{ article.title }}</h5>
+										<p class="card-text">{{ article.legend }}...</p>
+										<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#article{{ article.id }}">
+												Редактировать
+										</button>
+										<p class="card-text"><small class="text-muted">{{ article.time_published }}</small></p>
+										<hr>
+										{% for tag in article.tags.all %}
+										<a href="/articles/?tag={{ tag.name }}" class="badge badge-primary">{{ tag.name }}</a>
+										{% endfor %}
 								</div>
 						</div>
+				</div>
 		  </div>
+
+			<!--Modal window article-->
+			<div class="modal fade" id="article{{ article.id }}" tabindex="-1" role="dialog" aria-labelledby="title{{ article.id }}" aria-hidden="true">
+				<div class="modal-dialog modal-xl" role="document">
+					<div class="modal-content">
+						<form method="post" action="/profile/?section=articles">
+							{% csrf_token %}
+							<div class="modal-header">
+								<input name="id_article" type="hidden" value="{{ article.id }}">
+								<div class="input-group">
+								  <div class="input-group-prepend">
+								    <span class="input-group-text">Заголовок</span>
+								  </div>
+									<input name="change_title" class="modal-title form-control" id="title{{ article.id }}" value="{{ article.title }}">
+								</div>
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+							<div class="modal-body">
+
+								<div class="input-group">
+								  <div class="input-group-prepend">
+								    <span class="input-group-text">Краткое описание</span>
+								  </div>
+									<textarea name="change_legend" class="form-control">{{ article.legend }}</textarea><br>
+								</div>
+								<div class="input-group">
+								  <div class="input-group-prepend">
+								    <span class="input-group-text">Полное описание</span>
+								  </div>
+									<textarea name="change_description" class="form-control">{{ article.description }}</textarea><br>
+								</div>
+								<div class="input-group">
+								  <div class="input-group-prepend">
+								    <span class="input-group-text">Тэги</span>
+								  </div>
+									<input name="change_tags" class="form-control" value="{% for tag in article.tags.all %}{{ tag.name }}, {% endfor %}">
+								</div>
+							</div>
+							<div class="modal-footer justify-content-between">
+									<p class="card-text"><small class="text-muted">{{ article.time_published }}</small></p>
+									<input name="form_change" type="submit" class="btn btn-primary" data-toggle="modal" data-target="#article{{ article.id }}" value="Изменить">
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
 		{% empty %}
-			<h2 class="list-group-item">У вас нет ни одной статьи</h2>
+			<h2>У вас нет ни одной статьи</h2>
 		{% endfor %}
-		</div>
 	</div>
 </div>

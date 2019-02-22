@@ -1,6 +1,6 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from .models import Article, Tag
+from .models import Article, Tag, Target, Comment
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
 from django.shortcuts import render, redirect
@@ -63,27 +63,26 @@ def index(request):
 	})
 
 
-def profile_change(user, post):
-	alerts = []
+def profile_change(user, post, alerts):
 	if post.get('username', None):
 		user.username = post['username']
-		alerts.append('логин')
+		alerts['success'].append('Вы успешно изменили логин')
 
 	if post.get('firstname', None):
 		user.first_name = post['firstname']
-		alerts.append('имя')
+		alerts['success'].append('Вы успешно изменили имя')
 
 	if post.get('lastname', None):
 		user.last_name = post['lastname']
-		alerts.append('фамилию')
+		alerts['success'].append('Вы успешно изменили фамилию')
 
 	if post.get('email', None):
 		user.email = post['email']
-		alerts.append('эл. почту')
+		alerts['success'].append('Вы успешно изменили эл. почту')
 
 	if post.get('oldpass', None) and post.get('newpass', None) and user.check_password(post.get('oldpass', None)):
 		user.set_password(post['newpass'])
-		alerts.append('пароль')
+		alerts['success'].append('Вы успешно изменили пароль')
 
 	if len(alerts):
 		user.save()
@@ -91,18 +90,14 @@ def profile_change(user, post):
 	return alerts
 
 
-def add_article(user, post):
-	alerts = {
-		'success': None,
-		'danger': None
-	}
+def add_article(user, post, alerts):
 	if post.get('title', None) and post.get('short_text', None) and post.get('full_text', None) and post.get('tags', None):
 		try:
 			article = Article.objects.get(
 				title=post['title'],
 				author=user
 			)
-			alerts['danger'] = 'Такая статья уже есть'
+			alerts['danger'].append('Такая статья уже есть')
 		except Article.DoesNotExist:
 			article = Article.objects.create(
 				title=post['title'],
@@ -121,19 +116,58 @@ def add_article(user, post):
 					t.save()
 				article.tags.add(t)
 
-			alerts['success'] = post['title']
-	else:
-		alerts['danger'] = 'Введите все данные'
+			alerts['success'].append(post['title'])
+	elif post.get('form_add', None):
+		alerts['danger'].append('Введите все данные')
 
+	return alerts
+
+
+def change_article(user, post, alerts):
+	id = post.get('id_article', None)
+	title = post.get('change_title', None)
+	legend = post.get('change_legend', None)
+	description = post.get('change_description', None)
+	tags_str = post.get('change_tags', None)
+
+	if id and title and legend and description and tags_str:
+		try:
+			article = Article.objects.get(pk=id, author=user)
+			article.title = title
+			article.legend = legend
+			article.description = description
+			article.save()
+			tags = []
+			[tags.append(item) for item in tags_str.replace(' ', '').split(',') if item]
+			article.tags.clear()
+			print(tags)
+
+			for tag in tags:
+				try:
+					t = Tag.objects.get(name=tag)
+				except Tag.DoesNotExist:
+					t = Tag.objects.create(name=tag)
+					t.save()
+				article.tags.add(t)
+
+			alerts['success'].append("Вы отредактировали статью " + title)
+		except Article.DoesNotExist:
+			alerts['danger'].append('У вас не достаточно прав чтобы исправить эту статью')
+	elif post.get('form_change', None):
+		alerts['danger'].append('Неправильные данные')
+
+	return alerts
+
+
+def add_target(user, post, alerts):
 	return alerts
 
 
 def user_page(request, id=None):
 	section = request.GET.get('section', 'profile')
-	user_alerts = []
-	art_alerts = {
-		'success': None,
-		'danger': None
+	alerts = {
+		'success': [],
+		'danger': []
 	}
 
 	sid = request.session.get('_auth_user_id', None)
@@ -149,26 +183,31 @@ def user_page(request, id=None):
 			r = request.POST
 
 			# Change profile
-			user_alerts = profile_change(user, r)
+			alerts = profile_change(user, r, alerts)
 
 			# Made article
-			art_alerts = add_article(user, r)
-			print(art_alerts)
+			alerts = add_article(user, r, alerts)
+
+			# Edit article
+			alerts = change_article(user, r, alerts)
+
+			# Made target
+			alerts = add_target(user, r, alerts)
+			print(alerts)
 
 	else:
 		return redirect('/')
 
 	articles = Article.objects.filter(author__id=sid)
+	targets = Target.objects.filter(author__id=sid)
 
 	return render(request, 'users/index.html', context={
 		'user': user,
 		'section': section,
 		'header': header_data,
-		'alerts': {
-			'user': user_alerts,
-			'article': art_alerts
-		},
+		'alerts': alerts,
 		'articles': articles,
+		'targets': targets
 	})
 
 

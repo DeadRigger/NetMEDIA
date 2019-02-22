@@ -2,32 +2,23 @@
 {% block title %}{{ user.get_full_name }}{% endblock title %}
 {% block content %}
 <!--Alerts-->
-{% for alert in alerts.user %}
+{% for alert in alerts.success %}
 <div class="alert alert-success alert-dismissible fade show" role="alert">
-  Вы успешно изменили {{ alert }}
+  {{ alert }}
   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
     <span aria-hidden="true">&times;</span>
   </button>
 </div>
 {% endfor %}
 
-{% if alerts.article.success is not None %}
-<div class="alert alert-success alert-dismissible fade show" role="alert">
-  Вы опубликовали статью {{ alerts.article.success }}
-  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    <span aria-hidden="true">&times;</span>
-  </button>
-</div>
-{% endif %}
-
-{% if alerts.article.danger is not None %}
+{% for alert in alerts.danger %}
 <div class="alert alert-danger alert-dismissible fade show" role="alert">
-  {{ alerts.article.danger }}
+  {{ alert }}
   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
     <span aria-hidden="true">&times;</span>
   </button>
 </div>
-{% endif %}
+{% endfor %}
 
 
 <div class="nav nav-pills my-3" id="pills-tab" role="tablist">

@@ -6,7 +6,7 @@
     </button>
 	</div>
 	<div class="collapse" id="collapseExample">
-	  <form method="post">
+	  <form method="post"  action="/profile/?section=target">
 			{% csrf_token %}
 			<div class="card-body">
 				<div class="input-group mb-3">
@@ -41,32 +41,19 @@
 		<h2>Задачи</h2>
 	</div>
 	<div class="card-body">
-		<div class="card">
-		{% for article in articles %}
+		{% for target in targets %}
 		  <div class="card bg-light mb-3">
-						<div class="row no-gutters">
-								<div class="col-sm-4">
-										<img src="" class="card-img" alt="">
-								</div>
-								<div class="col-sm-8">
-										<div class="card-body">
-												<h5 class="card-title">{{ article.title }}</h5>
-												<p class="card-text">{{ article.legend }}...</p>
-												<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#article{{ article.id }}">
-														Редактировать
-												</button>
-												<p class="card-text"><small class="text-muted">{{ article.time_published }}</small></p>
-												<hr>
-												{% for tag in article.tags.all %}
-												<a href="/articles/?tag={{ tag.name }}" class="badge badge-primary">{{ tag.name }}</a>
-												{% endfor %}
-										</div>
-								</div>
-						</div>
+				<div class="card-body">
+						<h5 class="card-title">{{ target.title }}</h5>
+						<p class="card-text">{{ target.description }}...</p>
+						<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#target{{ target.id }}">
+								Редактировать
+						</button>
+						<p class="card-text"><small class="text-muted">{{ target.time_made }}</small></p>
+				</div>
 		  </div>
 		{% empty %}
-			<h2 class="list-group-item">У вас нет ни одной статьи</h2>
+			<h2>Вы не создавали ни одной задачи</h2>
 		{% endfor %}
-		</div>
 	</div>
 </div>
