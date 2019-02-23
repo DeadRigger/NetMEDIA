@@ -64,24 +64,31 @@ def index(request):
 
 
 def profile_change(user, post, alerts):
-	if post.get('username', None):
-		user.username = post['username']
+	username = post.get('username', None)
+	firstname = post.get('firstname', None)
+	lastname = post.get('lastname', None)
+	email = post.get('email', None)
+	oldpass = post.get('oldpass', None)
+	newpass = post.get('newpass', None)
+
+	if username:
+		user.username = username
 		alerts['success'].append('Вы успешно изменили логин')
 
-	if post.get('firstname', None):
-		user.first_name = post['firstname']
+	if firstname:
+		user.first_name = firstname
 		alerts['success'].append('Вы успешно изменили имя')
 
-	if post.get('lastname', None):
-		user.last_name = post['lastname']
+	if lastname:
+		user.last_name = lastname
 		alerts['success'].append('Вы успешно изменили фамилию')
 
-	if post.get('email', None):
-		user.email = post['email']
+	if email:
+		user.email = email
 		alerts['success'].append('Вы успешно изменили эл. почту')
 
-	if post.get('oldpass', None) and post.get('newpass', None) and user.check_password(post.get('oldpass', None)):
-		user.set_password(post['newpass'])
+	if oldpass and newpass and user.check_password(oldpass):
+		user.set_password(newpass)
 		alerts['success'].append('Вы успешно изменили пароль')
 
 	if len(alerts):
@@ -91,23 +98,28 @@ def profile_change(user, post, alerts):
 
 
 def add_article(user, post, alerts):
-	if post.get('title', None) and post.get('short_text', None) and post.get('full_text', None) and post.get('tags', None):
+	title = post.get('title', None)
+	short_text = post.get('short_text', None)
+	full_text = post.get('full_text', None)
+	tags = post.get('tags', None)
+
+	if title and short_text and full_text and tags:
 		try:
 			article = Article.objects.get(
-				title=post['title'],
+				title=title,
 				author=user
 			)
 			alerts['danger'].append('Такая статья уже есть')
 		except Article.DoesNotExist:
 			article = Article.objects.create(
-				title=post['title'],
-				legend=post['short_text'],
-				description=post['full_text'],
+				title=title,
+				legend=short_text,
+				description=full_text,
 				author=user
 			)
 
 			article.save()
-			tags = post['tags'].replace(" ", "").split(',')
+			tags = tags.replace(" ", "").split(',')
 			for tag in tags:
 				try:
 					t = Tag.objects.get(name=tag)
@@ -116,7 +128,7 @@ def add_article(user, post, alerts):
 					t.save()
 				article.tags.add(t)
 
-			alerts['success'].append(post['title'])
+			alerts['success'].append("Статья " + title + " успешно добавлена")
 	elif post.get('form_add', None):
 		alerts['danger'].append('Введите все данные')
 
@@ -160,6 +172,30 @@ def change_article(user, post, alerts):
 
 
 def add_target(user, post, alerts):
+	title = post.get('title_target', None)
+	description = post.get('short_target', None)
+	price = post.get('price', None)
+
+	if title and description and price:
+		try:
+			Target.objects.get(
+				title=title,
+				author=user
+			)
+			alerts['danger'].append('У вас уже есть такая же задача или похожая, измените её')
+		except Target.DoesNotExist:
+			target = Target.objects.create(
+				title=title,
+				description=description,
+				price=price,
+				currency="RUB",
+				author=user
+			)
+			target.save()
+			alerts['success'].append("Вы добавили задачу, которую надо выполнить")
+	elif post.get('add_target', None):
+		alerts['danger'].append("Введите корректные данные")
+
 	return alerts
 
 
